@@ -1,0 +1,61 @@
+name: Build RBX Cursor Studio portable
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-rbx-cursor-studio.yml"
+      - ".gitmodules"
+      - "third_party/Roblox-Cursor-Studio"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rbx-cursor-studio-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-portable:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out repository and pinned submodule
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: third_party/Roblox-Cursor-Studio/package-lock.json
+
+      - name: Install locked dependencies and build native helper
+        working-directory: third_party/Roblox-Cursor-Studio
+        run: npm ci
+
+      - name: Build portable executable only
+        working-directory: third_party/Roblox-Cursor-Studio
+        run: npm run dist -- --win portable --publish=never
+
+      - name: Verify portable executable exists
+        shell: pwsh
+        run: |
+          $files = @(Get-ChildItem "third_party/Roblox-Cursor-Studio/dist" -Filter "*Portable*.exe")
+          if ($files.Count -eq 0) {
+            throw "No portable executable was produced."
+          }
+          $files | ForEach-Object {
+            Write-Host "$($_.FullName) ($([math]::Round($_.Length / 1MB, 1)) MB)"
+          }
+
+      - name: Upload portable executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: RBX-Cursor-Studio-Portable-Windows
+          path: third_party/Roblox-Cursor-Studio/dist/*Portable*.exe
+          if-no-files-found: error
+          retention-days: 30

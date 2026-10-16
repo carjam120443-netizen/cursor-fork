@@ -208,3 +208,18 @@ git push origin v1.2.0
 The workflow then builds that tagged commit and attaches the files above to the release. Use a new version tag for each release. Releases are not created for ordinary pushes or pull requests.
 
 **Security note:** automated compilation and checksums do not prove that a build is malware-free. These builds are unsigned; inspect the source, test in a disposable Windows VM, and scan the resulting files before recommending them to others.
+
+
+## RBX Cursor Studio (separate project)
+
+The `third_party/Roblox-Cursor-Studio` folder is a pinned Git submodule pointing to [Carl00-mpeek/Roblox-Cursor-Studio](https://github.com/Carl00-mpeek/Roblox-Cursor-Studio). It is a separate Electron application; it does not replace the Numix cursor manager.
+
+To clone this repository with the nested project populated:
+
+```powershell
+git clone --recurse-submodules https://github.com/carjam120443-netizen/cursor-fork.git
+```
+
+A Windows GitHub Actions workflow builds a **portable RBX Cursor Studio executable** from the pinned upstream source. Download it from this repository's Actions run artifacts; the build does not run on your PC. The portable build is intended to run without elevation. Do not use **Run as administrator**. The app modifies Roblox cursor image files when applying a pack, so use its built-in original/restore feature before uninstalling or changing Roblox versions.
+
+**License:** RBX Cursor Studio remains under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0), with required notice: `Required Notice: Copyright (c) 2026 Demhat Dayan`. See the upstream [LICENSE.md](https://github.com/Carl00-mpeek/Roblox-Cursor-Studio/blob/main/LICENSE.md). The submodule is pinned to a specific upstream commit; update it deliberately after reviewing upstream changes.
