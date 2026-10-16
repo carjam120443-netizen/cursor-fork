@@ -1,5 +1,5 @@
 # NumixCursorTheme-WindowsInstaller (v1.2.4)
-
+# slowly becoming more then what i expected
 [![License: Wrapper](https://img.shields.io/badge/license-Wrapper%20License-blue)](./LICENSE)
 [![License: Cursors](https://img.shields.io/badge/license-GPL--3.0-green)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-lightgrey)](https://github.com/KamalAraf/NumixCursorTheme-WindowsInstaller)
