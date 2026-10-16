@@ -1,0 +1,95 @@
+name: Build Windows installer
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build executable
+        shell: pwsh
+        run: |
+          Push-Location src
+          try {
+            & .\build.bat
+            if ($LASTEXITCODE -ne 0) {
+              throw "build.bat failed with exit code $LASTEXITCODE"
+            }
+            if (-not (Test-Path .\NumixCursorsManager.exe)) {
+              throw "Build did not produce NumixCursorsManager.exe"
+            }
+          }
+          finally {
+            Pop-Location
+          }
+
+      - name: Prepare distributable files
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $out = Join-Path $PWD "dist"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+
+          Copy-Item "src\NumixCursorsManager.exe" "$out\NumixCursorsManager.exe"
+          Copy-Item "README.md" "$out\README.md"
+          Copy-Item "LICENSE" "$out\LICENSE"
+
+          # Include the complete source tree so users can inspect/rebuild the program.
+          git archive --format=zip --output="$out\NumixCursorsManager-source.zip" HEAD
+
+          # Package the executable and its documentation together for convenient download.
+          Compress-Archive -Path "$out\NumixCursorsManager.exe","$out\README.md","$out\LICENSE" -DestinationPath "$out\NumixCursorsManager-windows.zip" -Force
+
+          $filesToHash = @(
+            "$out\NumixCursorsManager.exe",
+            "$out\NumixCursorsManager-windows.zip",
+            "$out\NumixCursorsManager-source.zip"
+          )
+          $hashLines = foreach ($file in $filesToHash) {
+            $hash = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLowerInvariant()
+            "$hash  $([IO.Path]::GetFileName($file))"
+          }
+          $hashLines | Set-Content -Encoding ascii "$out\SHA256SUMS.txt"
+
+      - name: Upload build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: NumixCursorsManager-windows-build
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish GitHub Release for version tags
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $notes = @"
+          Automated Windows build for $tag.
+
+          Assets:
+          - NumixCursorsManager.exe: standalone executable
+          - NumixCursorsManager-windows.zip: executable and documentation
+          - NumixCursorsManager-source.zip: source snapshot used for this build
+          - SHA256SUMS.txt: SHA-256 checksums for the executable and ZIP archives
+
+          This build is not code-signed. A successful build does not itself establish that the program is malware-free; review the source and scan/test the files before use.
+          "@
+          gh release create "$tag" dist\NumixCursorsManager.exe dist\NumixCursorsManager-windows.zip dist\NumixCursorsManager-source.zip dist\SHA256SUMS.txt --title "Numix Cursors Manager $tag" --notes $notes
