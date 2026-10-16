@@ -7,7 +7,7 @@
 
 [![Preview](assets/preview.png)](assets/preview.png)
  
-## this is not mine! pleaese please! use the original github repo if you want stable,working updates.
+## this is not mine! please use the original github repo if you want stable,working updates.
 > A dependency-free Windows installer for the Numix cursor theme.
 
 This project is a **Windows-native port** of the original [numix-cursor-theme](https://github.com/numixproject/numix-cursor-theme) by the [Numix Project](https://github.com/numixproject).  
