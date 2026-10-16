@@ -185,3 +185,25 @@ This installer wrapper is a convenience repackaging for Windows users. Cursor fi
 
 The **installer wrapper** (C# source code, manifest, project structure, and documentation) is licensed under the [Installer Wrapper License](./LICENSE).  
 The **cursor assets** (`.cur`, `.ani`) retain their original [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html) license from the Numix Project.
+
+## Automated Windows builds
+
+GitHub Actions builds the Windows executable on every push to `main`, on pull requests, and when started manually from the **Actions** tab. Each successful run uploads a downloadable build artifact named `NumixCursorsManager-windows-build` (available from that workflow run for 30 days).
+
+The artifact contains:
+
+- `NumixCursorsManager.exe` — the compiled application
+- `NumixCursorsManager-windows.zip` — the executable with this README and the license
+- `NumixCursorsManager-source.zip` — the source snapshot used for the build
+- `SHA256SUMS.txt` — SHA-256 checksums for the executable and ZIP files
+
+To publish a GitHub Release, create and push a version tag after reviewing and testing the commit:
+
+```powershell
+git tag v1.2.0
+git push origin v1.2.0
+```
+
+The workflow then builds that tagged commit and attaches the files above to the release. Use a new version tag for each release. Releases are not created for ordinary pushes or pull requests.
+
+**Security note:** automated compilation and checksums do not prove that a build is malware-free. These builds are unsigned; inspect the source, test in a disposable Windows VM, and scan the resulting files before recommending them to others.
