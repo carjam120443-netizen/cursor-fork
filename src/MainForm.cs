@@ -67,8 +67,8 @@ namespace NumixCursorsManager
             variantNames = new string[] { "Numix-Cursor", "Numix-Cursor-Light" };
             variantInstallDirs = new string[]
             {
-                Path.Combine(WinRoot, "Cursors", variantNames[0]),
-                Path.Combine(WinRoot, "Cursors", variantNames[1]),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NumixCursors", variantNames[0]),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NumixCursors", variantNames[1]),
             };
             variantSchemeValues = new string[]
             {
