@@ -51,6 +51,9 @@ jobs:
 
           # Include the complete source tree so users can inspect/rebuild the program.
           git archive --format=zip --output="$out\NumixCursorsManager-source.zip" HEAD
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not create the source archive"
+          }
 
           # Package the executable and its documentation together for convenient download.
           Compress-Archive -Path "$out\NumixCursorsManager.exe","$out\README.md","$out\LICENSE" -DestinationPath "$out\NumixCursorsManager-windows.zip" -Force
@@ -74,12 +77,13 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish GitHub Release for version tags
+      - name: Publish or update GitHub Release for version tags
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
         shell: pwsh
         run: |
+          $ErrorActionPreference = "Stop"
           $tag = "${{ github.ref_name }}"
           $notes = @"
           Automated Windows build for $tag.
@@ -92,4 +96,18 @@ jobs:
 
           This build is not code-signed. A successful build does not itself establish that the program is malware-free; review the source and scan/test the files before use.
           "@
-          gh release create "$tag" dist\NumixCursorsManager.exe dist\NumixCursorsManager-windows.zip dist\NumixCursorsManager-source.zip dist\SHA256SUMS.txt --title "Numix Cursors Manager $tag" --notes $notes
+
+          # Keep existing releases and tags. Create a release only when one does not exist.
+          gh release view "$tag" --json tagName *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create "$tag" --title "Numix Cursors Manager $tag" --notes $notes
+            if ($LASTEXITCODE -ne 0) {
+              throw "Failed to create GitHub Release for $tag"
+            }
+          }
+
+          # Upload assets to existing or newly created releases; replace same-named assets safely.
+          gh release upload "$tag" dist\NumixCursorsManager.exe dist\NumixCursorsManager-windows.zip dist\NumixCursorsManager-source.zip dist\SHA256SUMS.txt --clobber
+          if ($LASTEXITCODE -ne 0) {
+            throw "Failed to upload build assets to GitHub Release $tag"
+          }
