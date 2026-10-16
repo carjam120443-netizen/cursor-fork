@@ -16,7 +16,7 @@ The original repository provides Linux-first tooling and requires additional dep
 
 ## What's included
 
-* **`NumixCursorsManager.exe`** — fully self-contained: all cursor files are embedded inside the exe, so **no ZIP or extra files are needed** to install the theme
+* **`NumixCursorsManager.exe`** — self-contained executable with embedded cursor resources; installs cursor files to the current user profile
 * **Two cursor variants**, each covering the full Numix cursor set for Windows:
   * **Numix Cursor Dark** — dark-colored cursors for light backgrounds
   * **Numix Cursor Light** — white cursors for dark backgrounds
@@ -40,7 +40,7 @@ The original repository provides Linux-first tooling and requires additional dep
 > The release includes the precompiled `NumixCursorsManager.exe` — a single self-contained file. No ZIP, no other files, no build step required.
 
 1. Download `NumixCursorsManager.exe` from the [Releases](https://github.com/KamalAraf/NumixCursorTheme-WindowsInstaller/releases) page
-2. Double-click `NumixCursorsManager.exe` — UAC elevation is automatic
+2. Double-click `NumixCursorsManager.exe` — it runs as your current user and does not request administrator privileges
 3. Select your preferred **cursor variant**: **Numix Cursor Dark** (dark-colored, for light backgrounds) or **Numix Cursor Light** (white, for dark backgrounds)
 4. Select **"Install"**
 5. (Optional) Check **"Set as active cursor immediately"** to apply the theme right away
@@ -61,7 +61,7 @@ The ZIP attached to the releases is a source-code archive only — it is **not r
 
 The **Numix Cursors Manager** lets you pick a **Cursor Variant** (Dark or Light) and then perform one of four actions:
 
-* **Install** — Copies static and animated cursor files to the system directory and registers the theme.
+* **Install** — Copies static and animated cursor files to `%LOCALAPPDATA%\NumixCursors` and registers the theme for the current user. No administrator rights are required.
 * **Set Active** — Activates the theme if already installed, without reinstalling.
 * **Uninstall** — Removes the theme and all cursor files. Automatically restores the Windows default cursor if the theme is currently active.
 * **Restore Windows Default** — Resets the cursor theme to Windows default. Skips the operation if the default is already active.
