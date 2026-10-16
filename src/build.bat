@@ -4,7 +4,7 @@ rem making the exe fully self-contained (no cursors/ folder needed at runtime).
 
 set CSC=%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe
 
-%CSC% /out:NumixCursorsManager.exe /target:winexe /reference:System.Windows.Forms.dll /reference:System.Drawing.dll "/win32icon:..\assets\logo.ico" ^
+%CSC% /out:NumixCursorsManager.exe /target:winexe /win32manifest:app.manifest /reference:System.Windows.Forms.dll /reference:System.Drawing.dll "/win32icon:..\assets\logo.ico" ^
 /resource:cursors\dark\static\crosshair.cur,NumixCursors.cursors.dark.static.crosshair.cur ^
 /resource:cursors\dark\static\default.cur,NumixCursors.cursors.dark.static.default.cur ^
 /resource:cursors\dark\static\fleur.cur,NumixCursors.cursors.dark.static.fleur.cur ^
